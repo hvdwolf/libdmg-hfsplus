@@ -179,9 +179,9 @@ int absFileRead(io_func* io, off_t location, size_t size, void *buffer) {
 	file = (AbstractFile*) io->data;
 	file->seek(file, location);
 	if(file->read(file, buffer, size) == size) {
-		return TRUE;
+		return 1;
 	} else {
-		return FALSE;
+		return 0;
 	}
 }
 
@@ -190,9 +190,9 @@ int absFileWrite(io_func* io, off_t location, size_t size, void *buffer) {
 	file = (AbstractFile*) io->data;
 	file->seek(file, location);
 	if(file->write(file, buffer, size) == size) {
-		return TRUE;
+		return 1;
 	} else {
-		return FALSE;
+		return 0;
 	}
 }
 

@@ -247,7 +247,7 @@ extern "C" {
 				uint32_t checksumType, ChecksumFunc uncompressedChk, void* uncompressedChkToken, ChecksumFunc compressedChk,
 				void* compressedChkToken);
 
-	int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut);
+	void convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut);
 #ifdef __cplusplus
 }
 #endif

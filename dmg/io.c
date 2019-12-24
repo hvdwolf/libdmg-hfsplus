@@ -91,7 +91,7 @@ BLKXTable* insertBLKX(AbstractFile* out, AbstractFile* in, uint32_t firstSectorN
 
 		ASSERT((ret = deflate(&strm, Z_FINISH)) != Z_STREAM_ERROR, "deflate/Z_STREAM_ERROR");
 		if(ret != Z_STREAM_END) {
-			ASSERT(FALSE, "deflate");
+			ASSERT(0, "deflate");
 		}
 		have = bufferSize - strm.avail_out;
 

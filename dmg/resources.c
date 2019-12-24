@@ -338,7 +338,7 @@ static void readNSizResource(NSizResource* data, char** location) {
   
   curLoc = *location;
   
-  data->isVolume = FALSE;
+  data->isVolume = 0;
   data->sha1Digest = NULL;
   data->blockChecksum2 = 0;
   data->bytes = 0;
@@ -363,7 +363,6 @@ static void readNSizResource(NSizResource* data, char** location) {
     
     if(strncmp(tagBegin, "SHA-1-digest", strLen) == 0) {
       data->sha1Digest = getXMLData(&curLoc, &dummy);;
-      /*flipEndian(data->sha1Digest, 4);*/
     } else if(strncmp(tagBegin, "block-checksum-2", strLen) == 0) {
       data->blockChecksum2 = getXMLInteger(&curLoc);
     } else if(strncmp(tagBegin, "bytes", strLen) == 0) {
@@ -376,7 +375,7 @@ static void readNSizResource(NSizResource* data, char** location) {
       data->version = getXMLInteger(&curLoc);
     } else if(strncmp(tagBegin, "volume-signature", strLen) == 0) {
       data->volumeSignature = getXMLInteger(&curLoc);
-      data->isVolume = TRUE;
+      data->isVolume = 1;
     }
   }
   
@@ -554,7 +553,7 @@ ResourceKey* readResources(AbstractFile* file, UDIFResourceFile* resourceFile) {
     return NULL;
   curLoc += sizeof("<dict>") - 1;
   
-  while(TRUE) {
+  while(1) {
     curLoc = strstr(curLoc, "<key>");
     if(!curLoc)
       break;

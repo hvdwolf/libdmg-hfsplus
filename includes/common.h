@@ -13,9 +13,6 @@
 #define off_t off64_t
 #endif
 
-#define TRUE 1
-#define FALSE 0
-
 #define FLIPENDIAN(x) flipEndian((unsigned char *)(&(x)), sizeof(x))
 
 #define TIME_OFFSET_FROM_UNIX 2082844800L

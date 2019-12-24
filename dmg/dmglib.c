@@ -42,7 +42,7 @@ uint32_t calculateMasterChecksum(ResourceKey* resources) {
 	return result;  
 }
 
-int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
+void convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
 	
 	BLKXTable* blkx;
 	ResourceKey* resources = NULL;
@@ -93,7 +93,7 @@ int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
 	}
 	
 	memset(myNSiz, 0, sizeof(NSizResource));
-	myNSiz->isVolume = FALSE;
+	myNSiz->isVolume = 0;
 	myNSiz->blockChecksum2 = uncompressedToken.block;
 	myNSiz->partitionNumber = 0;
 	myNSiz->version = 6;
@@ -167,6 +167,4 @@ int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
 	printf("Done\n"); fflush(stdout);
 
 	abstractOut->close(abstractOut);
-	
-	return TRUE;
 }
