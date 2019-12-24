@@ -831,20 +831,3 @@ ResourceKey* insertData(ResourceKey* resources, const char* key, int id, const c
 ResourceKey* makePlst() {
   return insertData(NULL, "plst", 0, "", plstData, sizeof(plstData), ATTRIBUTE_HDIUTIL); 
 }
-
-ResourceKey* makeSize(HFSPlusVolumeHeader* volumeHeader) {
-  SizeResource size;
-  memset(&size, 0, sizeof(SizeResource));
-  size.version = 5;
-  size.isHFS = 1;
-  size.unknown2 = 0;
-  size.unknown3 = 0;
-  size.volumeModified = volumeHeader->modifyDate;
-  size.unknown4 = 0;
-  size.volumeSignature = volumeHeader->signature;
-  size.sizePresent = 1;
-
-  printf("making size data\n");  
-  return insertData(NULL, "size", 0, "", (const char*)(&size), sizeof(SizeResource), 0); 
-}
-

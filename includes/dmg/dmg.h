@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <hfs/hfsplus.h>
 #include "abstractfile.h"
 
 #define CHECKSUM_CRC32 0x00000002
@@ -312,7 +311,6 @@ extern "C" {
 	ResourceData* getDataByID(ResourceKey* resource, int id);
 	ResourceKey* insertData(ResourceKey* resources, const char* key, int id, const char* name, const char* data, size_t dataLength, uint32_t attributes);
 	ResourceKey* makePlst();
-	ResourceKey* makeSize(HFSPlusVolumeHeader* volumeHeader);
 
 	void flipDriverDescriptorRecord(DriverDescriptorRecord* record, char out);
 	void flipPartition(Partition* partition, char out, unsigned int BlockSize);
@@ -330,7 +328,7 @@ extern "C" {
 	void extractBLKX(AbstractFile* in, AbstractFile* out, BLKXTable* blkx);
 	BLKXTable* insertBLKX(AbstractFile* out, AbstractFile* in, uint32_t firstSectorNumber, uint32_t numSectors, uint32_t blocksDescriptor,
 				uint32_t checksumType, ChecksumFunc uncompressedChk, void* uncompressedChkToken, ChecksumFunc compressedChk,
-				void* compressedChkToken, Volume* volume);
+				void* compressedChkToken);
 
 	int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut);
 #ifdef __cplusplus
