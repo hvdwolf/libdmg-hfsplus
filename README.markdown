@@ -1,5 +1,4 @@
-README
-======
+# libdmg-hfsplus
 
 This project was first conceived to manipulate Apple's software restore
 packages (IPSWs) and hence much of it is geared specifically toward that
@@ -21,32 +20,28 @@ accessed by other programs that know what they're doing. I.e., doing
 something you "shouldn't" be able to do, like removing non-existent files is
 probably not a very good idea.
 
-LICENSE
--------
+## License
 
 This work is released under the terms of the GNU General Public License,
 version 3. The full text of the license can be found in the LICENSE file.
 
-DEPENDENCIES
-------------
+## Dependencies
 
 The HFS portion will work on any platform that supports GNU C and POSIX
 conventions. The dmg portion has dependencies on zlib.
 
-USING
------
+## Using
 
 The targets of the current repository are three command-line utilities that
 demonstrate the usage of the library functions (except cmd_grow, which really
 ought to be moved to catalog.c). The dmg portion of the code has dependencies
 on the HFS+ portion of the code.
 
-### HFS+
+## Build
 
-	cd hfs
-	make
-
-### DMG
-
-	cd dmg
-	make
+Configure, compile and run using:
+```bash
+cmake -S . -B build
+make -C build/dmg -j8
+build/dmg/dmg
+```
