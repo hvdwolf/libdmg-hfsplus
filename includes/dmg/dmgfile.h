@@ -6,9 +6,6 @@
 
 #include <dmg/dmg.h>
 
-io_func* openDmgFile(AbstractFile* dmg);
-io_func* openDmgFilePartition(AbstractFile* dmg, int partition);
-
 typedef struct DMG {
 	AbstractFile* dmg;
 	ResourceKey* resources;

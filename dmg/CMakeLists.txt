@@ -6,7 +6,7 @@ ENDIF(NOT ZLIB_FOUND)
 
 link_directories(${PROJECT_BINARY_DIR}/common)
 
-add_library(dmg adc.c base64.c checksum.c dmgfile.c dmglib.c io.c partition.c resources.c udif.c)
+add_library(dmg adc.c base64.c checksum.c dmgfile.c dmglib.c io.c resources.c udif.c)
 
 target_link_libraries(dmg common z)
 
