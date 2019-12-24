@@ -279,14 +279,8 @@ extern "C" {
 	uint32_t CRC32Checksum(uint32_t* crc, const unsigned char *buf, size_t len);
 	uint32_t MKBlockChecksum(uint32_t* ckSum, const unsigned char* data, size_t len);
 
-	void BlockSHA1CRC(void* token, const unsigned char* data, size_t len);
 	void BlockCRC(void* token, const unsigned char* data, size_t len);
 	void CRCProxy(void* token, const unsigned char* data, size_t len);
-
-	void SHA1Transform(unsigned long state[5], const unsigned char buffer[64]);
-	void SHA1Init(SHA1_CTX* context);
-	void SHA1Update(SHA1_CTX* context, const unsigned char* data, unsigned int len);
-	void SHA1Final(unsigned char digest[20], SHA1_CTX* context);
 
 	void flipUDIFChecksum(UDIFChecksum* o, char out);
 	void readUDIFChecksum(AbstractFile* file, UDIFChecksum* o);
