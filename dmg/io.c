@@ -4,7 +4,6 @@
 #include <zlib.h>
 
 #include <dmg/dmg.h>
-#include <dmg/adc.h>
 #include <inttypes.h>
 
 #define SECTORS_AT_A_TIME 0x200
