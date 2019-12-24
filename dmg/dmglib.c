@@ -3,20 +3,17 @@
 #include "abstractfile.h"
 #include <dmg/dmg.h>
 
-uint32_t calculateMasterChecksum(ResourceKey* resources);
-
 uint32_t calculateMasterChecksum(ResourceKey* resources) {
 	ResourceKey* blkxKeys;
 	ResourceData* data;
 	BLKXTable* blkx;
 	unsigned char* buffer;
-	int blkxNum;
-	uint32_t result;
+	int blkxNum = 0;
+	uint32_t result = 0;
 	
 	blkxKeys = getResourceByKey(resources, "blkx");
 	
 	data = blkxKeys->data;
-	blkxNum = 0;
 	while(data != NULL) {
 		blkx = (BLKXTable*) data->data;
 		if(blkx->checksum.type == CHECKSUM_CRC32) {
@@ -25,7 +22,7 @@ uint32_t calculateMasterChecksum(ResourceKey* resources) {
 		data = data->next;
 	}
 	
-	buffer = (unsigned char*) malloc(4 * blkxNum) ;
+	buffer = (unsigned char*) malloc(4 * blkxNum);
 	data = blkxKeys->data;
 	blkxNum = 0;
 	while(data != NULL) {
@@ -40,55 +37,37 @@ uint32_t calculateMasterChecksum(ResourceKey* resources) {
 		data = data->next;
 	}
 	
-	result = 0;
 	CRC32Checksum(&result, (const unsigned char*) buffer, 4 * blkxNum);
 	free(buffer);
 	return result;  
 }
 
 int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
-	Partition* partitions;
-	DriverDescriptorRecord* DDM;
 	
 	BLKXTable* blkx;
-	ResourceKey* resources;
-	ResourceKey* curResource;
+	ResourceKey* resources = NULL;
+	ResourceKey* curResource = NULL;
 	
 	ChecksumToken dataForkToken;
 	ChecksumToken uncompressedToken;
 	
-	NSizResource* nsiz;
-	NSizResource* myNSiz;
+	NSizResource* nsiz = NULL;
+	NSizResource* myNSiz = NULL;
 	CSumResource csum;
 	
 	off_t plistOffset;
 	uint32_t plistSize;
 	uint32_t dataForkChecksum;
-	uint64_t numSectors;
+	uint64_t numSectors = 0;
 	
 	UDIFResourceFile koly;
-	
+
 	off_t fileLength;
-	
-	numSectors = 0;
-	
-	resources = NULL;
-	nsiz = NULL;
-	myNSiz = NULL;
+
 	memset(&dataForkToken, 0, sizeof(ChecksumToken));
 	memset(koly.fUDIFMasterChecksum.data, 0, sizeof(koly.fUDIFMasterChecksum.data));
 	memset(koly.fUDIFDataForkChecksum.data, 0, sizeof(koly.fUDIFDataForkChecksum.data));
-	
-	partitions = (Partition*) malloc(SECTOR_SIZE);
-	
-	printf("Processing DDM...\n"); fflush(stdout);
-	DDM = (DriverDescriptorRecord*) malloc(SECTOR_SIZE);
-	abstractIn->seek(abstractIn, 0);
-	ASSERT(abstractIn->read(abstractIn, DDM, SECTOR_SIZE) == SECTOR_SIZE, "fread");
-	flipDriverDescriptorRecord(DDM, FALSE);
-	
-	printf("No DDM! Just doing one huge blkx then...\n"); fflush(stdout);
-	
+
 	fileLength = abstractIn->getLength(abstractIn);
 	
 	memset(&uncompressedToken, 0, sizeof(uncompressedToken));
@@ -184,7 +163,6 @@ int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
 	releaseResources(resources);
 	
 	abstractIn->close(abstractIn);
-	free(partitions);
 	
 	printf("Done\n"); fflush(stdout);
 
