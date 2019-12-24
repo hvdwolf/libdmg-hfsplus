@@ -49,7 +49,6 @@ uint32_t calculateMasterChecksum(ResourceKey* resources) {
 int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
 	Partition* partitions;
 	DriverDescriptorRecord* DDM;
-	int i;
 	
 	BLKXTable* blkx;
 	ResourceKey* resources;
@@ -69,12 +68,7 @@ int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
 	
 	UDIFResourceFile koly;
 	
-	char partitionName[512];
-	
 	off_t fileLength;
-	size_t partitionTableSize;
-	
-	unsigned int BlockSize;
 	
 	numSectors = 0;
 	
@@ -93,107 +87,40 @@ int convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
 	ASSERT(abstractIn->read(abstractIn, DDM, SECTOR_SIZE) == SECTOR_SIZE, "fread");
 	flipDriverDescriptorRecord(DDM, FALSE);
 	
-	if(DDM->sbSig == DRIVER_DESCRIPTOR_SIGNATURE) {
-		BlockSize = DDM->sbBlkSize;
-		writeDriverDescriptorMap(abstractOut, DDM, &CRCProxy, (void*) (&dataForkToken), &resources);
-		free(DDM);
-		
-		printf("Processing partition map...\n"); fflush(stdout);
-		
-		abstractIn->seek(abstractIn, BlockSize);
-		ASSERT(abstractIn->read(abstractIn, partitions, BlockSize) == BlockSize, "fread");
-		flipPartitionMultiple(partitions, FALSE, FALSE, BlockSize);
-		
-		partitionTableSize = BlockSize * partitions->pmMapBlkCnt;
-		partitions = (Partition*) realloc(partitions, partitionTableSize);
-		
-		abstractIn->seek(abstractIn, BlockSize);
-		ASSERT(abstractIn->read(abstractIn, partitions, partitionTableSize) == partitionTableSize, "fread");
-		flipPartition(partitions, FALSE, BlockSize);
-		
-		printf("Writing blkx (%d)...\n", partitions->pmMapBlkCnt); fflush(stdout);
-		
-		for(i = 0; i < partitions->pmMapBlkCnt; i++) {
-			if(partitions[i].pmSig != APPLE_PARTITION_MAP_SIGNATURE) {
-				break;
-			}
-			
-			printf("Processing blkx %d, total %d...\n", i, partitions->pmMapBlkCnt); fflush(stdout);
-			
-			sprintf(partitionName, "%s (%s : %d)", partitions[i].pmPartName, partitions[i].pmParType, i + 1);
-			
-			memset(&uncompressedToken, 0, sizeof(uncompressedToken));
-			
-			abstractIn->seek(abstractIn, partitions[i].pmPyPartStart * BlockSize);
-			blkx = insertBLKX(abstractOut, abstractIn, partitions[i].pmPyPartStart, partitions[i].pmPartBlkCnt, i, CHECKSUM_CRC32,
-						&BlockCRC, &uncompressedToken, &CRCProxy, &dataForkToken, NULL);
-			
-			blkx->checksum.data[0] = uncompressedToken.crc;	
-			resources = insertData(resources, "blkx", i, partitionName, (const char*) blkx, sizeof(BLKXTable) + (blkx->blocksRunCount * sizeof(BLKXRun)), ATTRIBUTE_HDIUTIL);
-			free(blkx);
-			
-			memset(&csum, 0, sizeof(CSumResource));
-			csum.version = 1;
-			csum.type = CHECKSUM_MKBLOCK;
-			csum.checksum = uncompressedToken.block;
-			resources = insertData(resources, "cSum", i, "", (const char*) (&csum), sizeof(csum), 0);
-			
-			if(nsiz == NULL) {
-				nsiz = myNSiz = (NSizResource*) malloc(sizeof(NSizResource));
-			} else {
-				myNSiz->next = (NSizResource*) malloc(sizeof(NSizResource));
-				myNSiz = myNSiz->next;
-			}
-			
-			memset(myNSiz, 0, sizeof(NSizResource));
-			myNSiz->isVolume = FALSE;
-			myNSiz->blockChecksum2 = uncompressedToken.block;
-			myNSiz->partitionNumber = i;
-			myNSiz->version = 6;
-			myNSiz->next = NULL;
-			
-			if((partitions[i].pmPyPartStart + partitions[i].pmPartBlkCnt) > numSectors) {
-				numSectors = partitions[i].pmPyPartStart + partitions[i].pmPartBlkCnt;
-			}
-		}
-		
-		koly.fUDIFImageVariant = kUDIFDeviceImageType;
+	printf("No DDM! Just doing one huge blkx then...\n"); fflush(stdout);
+	
+	fileLength = abstractIn->getLength(abstractIn);
+	
+	memset(&uncompressedToken, 0, sizeof(uncompressedToken));
+	
+	abstractIn->seek(abstractIn, 0);
+	blkx = insertBLKX(abstractOut, abstractIn, 0, fileLength/SECTOR_SIZE, ENTIRE_DEVICE_DESCRIPTOR, CHECKSUM_CRC32,
+				&BlockCRC, &uncompressedToken, &CRCProxy, &dataForkToken, NULL);
+	blkx->checksum.data[0] = uncompressedToken.crc;
+	resources = insertData(resources, "blkx", 0, "whole disk (unknown partition : 0)", (const char*) blkx, sizeof(BLKXTable) + (blkx->blocksRunCount * sizeof(BLKXRun)), ATTRIBUTE_HDIUTIL);
+	free(blkx);
+	
+	memset(&csum, 0, sizeof(CSumResource));
+	csum.version = 1;
+	csum.type = CHECKSUM_MKBLOCK;
+	csum.checksum = uncompressedToken.block;
+	resources = insertData(resources, "cSum", 0, "", (const char*) (&csum), sizeof(csum), 0);
+	
+	if(nsiz == NULL) {
+		nsiz = myNSiz = (NSizResource*) malloc(sizeof(NSizResource));
 	} else {
-		printf("No DDM! Just doing one huge blkx then...\n"); fflush(stdout);
-		
-		fileLength = abstractIn->getLength(abstractIn);
-		
-		memset(&uncompressedToken, 0, sizeof(uncompressedToken));
-		
-		abstractIn->seek(abstractIn, 0);
-		blkx = insertBLKX(abstractOut, abstractIn, 0, fileLength/SECTOR_SIZE, ENTIRE_DEVICE_DESCRIPTOR, CHECKSUM_CRC32,
-					&BlockCRC, &uncompressedToken, &CRCProxy, &dataForkToken, NULL);
-		blkx->checksum.data[0] = uncompressedToken.crc;
-		resources = insertData(resources, "blkx", 0, "whole disk (unknown partition : 0)", (const char*) blkx, sizeof(BLKXTable) + (blkx->blocksRunCount * sizeof(BLKXRun)), ATTRIBUTE_HDIUTIL);
-		free(blkx);
-		
-		memset(&csum, 0, sizeof(CSumResource));
-		csum.version = 1;
-		csum.type = CHECKSUM_MKBLOCK;
-		csum.checksum = uncompressedToken.block;
-		resources = insertData(resources, "cSum", 0, "", (const char*) (&csum), sizeof(csum), 0);
-		
-		if(nsiz == NULL) {
-			nsiz = myNSiz = (NSizResource*) malloc(sizeof(NSizResource));
-		} else {
-			myNSiz->next = (NSizResource*) malloc(sizeof(NSizResource));
-			myNSiz = myNSiz->next;
-		}
-		
-		memset(myNSiz, 0, sizeof(NSizResource));
-		myNSiz->isVolume = FALSE;
-		myNSiz->blockChecksum2 = uncompressedToken.block;
-		myNSiz->partitionNumber = 0;
-		myNSiz->version = 6;
-		myNSiz->next = NULL;
-		
-		koly.fUDIFImageVariant = kUDIFPartitionImageType;
+		myNSiz->next = (NSizResource*) malloc(sizeof(NSizResource));
+		myNSiz = myNSiz->next;
 	}
+	
+	memset(myNSiz, 0, sizeof(NSizResource));
+	myNSiz->isVolume = FALSE;
+	myNSiz->blockChecksum2 = uncompressedToken.block;
+	myNSiz->partitionNumber = 0;
+	myNSiz->version = 6;
+	myNSiz->next = NULL;
+	
+	koly.fUDIFImageVariant = kUDIFPartitionImageType;
 	
 	dataForkChecksum = dataForkToken.crc;
 	
