@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <dmg/dmg.h>
-#include <dmg/filevault.h>
 
 char endianness;
 
@@ -52,8 +51,8 @@ int main(int argc, char* argv[]) {
 	hasKey = FALSE;
 	if(argc > 5) {
 		if(strcmp(argv[4], "-k") == 0) {
-			in = createAbstractFileFromFileVault(in, argv[5]);
-			hasKey = TRUE;
+			printf("FileVault functionality has been disabled.\n");
+			return 0;
 		}
 	}
 	

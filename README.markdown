@@ -31,11 +31,7 @@ DEPENDENCIES
 ------------
 
 The HFS portion will work on any platform that supports GNU C and POSIX
-conventions. The dmg portion has dependencies on zlib and
-libcrypto from openssl (which is not). If libcrypto is not available, remove
-the -DHAVE_CRYPT flags from the CFLAGS of the makefiles. All FileVault
-related actions will fail, but everything else should still work. I imagine
-most places have libcrypto.
+conventions. The dmg portion has dependencies on zlib.
 
 USING
 -----

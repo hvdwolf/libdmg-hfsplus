@@ -9,7 +9,7 @@ link_directories(${ZLIB_LIBRARIES})
 
 link_directories(${PROJECT_BINARY_DIR}/common ${PROJECT_BINARY_DIR}/hfs)
 
-add_library(dmg adc.c base64.c checksum.c dmgfile.c dmglib.c filevault.c io.c partition.c resources.c udif.c)
+add_library(dmg adc.c base64.c checksum.c dmgfile.c dmglib.c io.c partition.c resources.c udif.c)
 
 target_link_libraries(dmg common hfs z)
 

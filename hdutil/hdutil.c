@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <hfs/hfsplus.h>
 #include <dmg/dmgfile.h>
-#include <dmg/filevault.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -269,8 +268,8 @@ int main(int argc, const char *argv[]) {
 		image = createAbstractFileFromFile(fopen(argv[1], "rb"));
 		if(argc > 3) {
 			if(strcmp(argv[2], "-k") == 0) {
-				image = createAbstractFileFromFileVault(image, argv[3]);
-				argOff = 4;
+				printf("FileVault functionality has been disabled.\n");
+				return 0;
 			}
 		}
 		io = openDmgFilePartition(image, -1);
