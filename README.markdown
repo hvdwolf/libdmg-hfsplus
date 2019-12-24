@@ -31,12 +31,11 @@ DEPENDENCIES
 ------------
 
 The HFS portion will work on any platform that supports GNU C and POSIX
-conventions. The dmg portion has dependencies on zlib (which is included) and
+conventions. The dmg portion has dependencies on zlib and
 libcrypto from openssl (which is not). If libcrypto is not available, remove
 the -DHAVE_CRYPT flags from the CFLAGS of the makefiles. All FileVault
 related actions will fail, but everything else should still work. I imagine
-most places have libcrypto, and probably statically compiled zlib was a dumb
-idea too.
+most places have libcrypto.
 
 USING
 -----
@@ -59,10 +58,7 @@ The makefile in the root folder will make all utilities.
 
 ### DMG
 
-	cd dmg/zlib-1.2.3
-	./configure
-	make
-	cd ..
+	cd dmg
 	make
 
 ### hdutil
