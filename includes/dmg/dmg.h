@@ -20,29 +20,12 @@
 
 #define SECTOR_SIZE 512
 
-#define DRIVER_DESCRIPTOR_SIGNATURE 0x4552
-#define APPLE_PARTITION_MAP_SIGNATURE 0x504D
 #define UDIF_BLOCK_SIGNATURE 0x6D697368
 #define KOLY_SIGNATURE 0x6B6F6C79
-#define HFSX_SIGNATURE 0x4858
 
 #define ATTRIBUTE_HDIUTIL 0x0050
 
-#define HFSX_VOLUME_TYPE "Apple_HFSX"
-
-#define DDM_SIZE 0x1
-#define PARTITION_SIZE 0x3f
-#define ATAPI_SIZE 0x8
-#define FREE_SIZE 0xa
-#define EXTRA_SIZE (DDM_SIZE + PARTITION_SIZE + ATAPI_SIZE + FREE_SIZE)
-
-#define DDM_OFFSET 0x0
-#define PARTITION_OFFSET (DDM_SIZE)
-#define ATAPI_OFFSET (DDM_SIZE + PARTITION_SIZE)
-#define USER_OFFSET (DDM_SIZE + PARTITION_SIZE + ATAPI_SIZE)
-
-#define BOOTCODE_DMMY 0x444D4D59
-#define BOOTCODE_GOON 0x676F6F6E
+#define ENTIRE_DEVICE_DESCRIPTOR 0xFFFFFFFE
 
 enum {
 	kUDIFFlagsFlattened = 1
@@ -141,9 +124,6 @@ typedef struct NSizResource {
 	struct NSizResource* next;
 } NSizResource;
 
-#define DDM_DESCRIPTOR 0xFFFFFFFF
-#define ENTIRE_DEVICE_DESCRIPTOR 0xFFFFFFFE
-
 typedef struct {
 	uint32_t fUDIFBlocksSignature;
 	uint32_t infoVersion;
@@ -166,49 +146,6 @@ typedef struct {
 	uint32_t blocksRunCount;
 	BLKXRun runs[0];
 } __attribute__((__packed__)) BLKXTable;
-
-typedef struct {
-	uint32_t ddBlock;
-	uint16_t ddSize;
-	uint16_t ddType;
-} __attribute__((__packed__)) DriverDescriptor;
-
-typedef struct {
-	uint16_t pmSig;
-	uint16_t pmSigPad;
-	uint32_t pmMapBlkCnt;
-	uint32_t pmPyPartStart;
-	uint32_t pmPartBlkCnt;
-	unsigned char pmPartName[32];
-	unsigned char pmParType[32];
-	uint32_t pmLgDataStart;
-	uint32_t pmDataCnt;
-	uint32_t pmPartStatus;
-	uint32_t pmLgBootStart;
-	uint32_t pmBootSize;
-	uint32_t pmBootAddr;
-	uint32_t pmBootAddr2;
-	uint32_t pmBootEntry;
-	uint32_t pmBootEntry2;
-	uint32_t pmBootCksum;
-	unsigned char pmProcessor[16];
-	uint32_t bootCode;
-	uint16_t pmPad[186];
-} __attribute__((__packed__)) Partition;
-
-typedef struct {
-	uint16_t sbSig;
-	uint16_t sbBlkSize;
-	uint32_t sbBlkCount;
-	uint16_t sbDevType;
-	uint16_t sbDevId;
-	uint32_t sbData;
-	uint16_t sbDrvrCount;
-	uint32_t ddBlock;
-	uint16_t ddSize;
-	uint16_t ddType;
-	DriverDescriptor ddPad[0];
-} __attribute__((__packed__)) DriverDescriptorRecord;
 
 typedef struct ResourceData {
 	uint32_t attributes;
