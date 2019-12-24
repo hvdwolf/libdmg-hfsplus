@@ -5,26 +5,17 @@
 
 #include <dmg/dmg.h>
 
-char endianness;
-
-void TestByteOrder()
-{
-	short int word = 0x0001;
-	char *byte = (char *) &word;
-	endianness = byte[0] ? IS_LITTLE_ENDIAN : IS_BIG_ENDIAN;
-}
-
 int buildInOut(const char* source, const char* dest, AbstractFile** in, AbstractFile** out) {
 	*in = createAbstractFileFromFile(fopen(source, "rb"));
 	if(!(*in)) {
-		printf("cannot open source: %s\n", source);
+		printf("cannot open source ISO: %s\n", source);
 		return 0;
 	}
 
 	*out = createAbstractFileFromFile(fopen(dest, "wb"));
 	if(!(*out)) {
 		(*in)->close(*in);
-		printf("cannot open destination: %s\n", dest);
+		printf("cannot open destination DMG: %s\n", dest);
 		return 0;
 	}
 
@@ -34,8 +25,6 @@ int buildInOut(const char* source, const char* dest, AbstractFile** in, Abstract
 int main(int argc, char* argv[]) {
 	AbstractFile* in;
 	AbstractFile* out;
-	
-	TestByteOrder();
 	
 	if(argc < 3) {
 		printf("usage: ./dmg .iso .dmg\n");
