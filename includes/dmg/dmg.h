@@ -16,11 +16,9 @@
 #define BLOCK_TERMINATOR 0xFFFFFFFF
 
 #define UDIF_BLOCK_SIGNATURE 0x6D697368 // mish
-#define KOLY_SIGNATURE 0x6B6F6C79 // koly
+#define KOLY_SIGNATURE 0x6B6F6C79       // koly
 
 #define ATTRIBUTE_HDIUTIL 0x0050
-
-#define ENTIRE_DEVICE_DESCRIPTOR 0xFFFFFFFE
 
 enum { kUDIFFlagsFlattened = 1 };
 
@@ -251,9 +249,9 @@ ResourceKey *makePlst();
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
                       uint32_t firstSectorNumber, uint32_t fileLength,
-                      uint32_t blocksDescriptor, uint32_t checksumType,
-                      ChecksumFunc uncompressedChk, void *uncompressedChkToken,
-                      ChecksumFunc compressedChk, void *compressedChkToken);
+                      uint32_t checksumType, ChecksumFunc uncompressedChk,
+                      void *uncompressedChkToken, ChecksumFunc compressedChk,
+                      void *compressedChkToken);
 
 void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut);
 #ifdef __cplusplus

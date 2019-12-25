@@ -75,9 +75,8 @@ void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
   memset(&uncompressedToken, 0, sizeof(uncompressedToken));
 
   abstractIn->seek(abstractIn, 0);
-  blkx = insertBLKX(abstractOut, abstractIn, 0, fileLength,
-                    ENTIRE_DEVICE_DESCRIPTOR, CHECKSUM_CRC32, &BlockCRC,
-                    &uncompressedToken, &CRCProxy, &dataForkToken);
+  blkx = insertBLKX(abstractOut, abstractIn, 0, fileLength, CHECKSUM_CRC32,
+                    &BlockCRC, &uncompressedToken, &CRCProxy, &dataForkToken);
   blkx->checksum.data[0] = uncompressedToken.crc;
   resources =
       insertData(resources, "blkx", 0, "whole disk (unknown partition : 0)",

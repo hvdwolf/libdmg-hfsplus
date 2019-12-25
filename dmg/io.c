@@ -6,15 +6,16 @@
 #include <dmg/dmg.h>
 #include <inttypes.h>
 
-#define BUFFERS_NEEDED 0x208 // 520
+#define BUFFERS_NEEDED 0x208    // 520
+#define ENTIRE_DEVICE_DESCRIPTOR 0xFFFFFFFE
 #define SECTORS_AT_A_TIME 0x200 // 512
 #define SECTOR_SIZE 512
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
                       uint32_t firstSectorNumber, uint32_t fileLength,
-                      uint32_t blocksDescriptor, uint32_t checksumType,
-                      ChecksumFunc uncompressedChk, void *uncompressedChkToken,
-                      ChecksumFunc compressedChk, void *compressedChkToken) {
+                      uint32_t checksumType, ChecksumFunc uncompressedChk,
+                      void *uncompressedChkToken, ChecksumFunc compressedChk,
+                      void *compressedChkToken) {
   BLKXTable *blkx;
 
   uint32_t roomForRuns = 2;
@@ -40,7 +41,7 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
   blkx->sectorCount = numSectors;
   blkx->dataStart = 0;
   blkx->decompressBufferRequested = BUFFERS_NEEDED;
-  blkx->blocksDescriptor = blocksDescriptor;
+  blkx->blocksDescriptor = ENTIRE_DEVICE_DESCRIPTOR;
   blkx->reserved1 = 0;
   blkx->reserved2 = 0;
   blkx->reserved3 = 0;
