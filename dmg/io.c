@@ -6,7 +6,8 @@
 #include <dmg/dmg.h>
 #include <inttypes.h>
 
-#define SECTORS_AT_A_TIME 0x200
+#define BUFFERS_NEEDED 0x208 // 520
+#define SECTORS_AT_A_TIME 0x200 // 512
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
                       uint32_t firstSectorNumber, uint32_t numSectors,
@@ -15,9 +16,9 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
                       ChecksumFunc compressedChk, void *compressedChkToken) {
   BLKXTable *blkx;
 
-  uint32_t roomForRuns;
-  uint32_t curRun;
-  uint64_t curSector;
+  uint32_t roomForRuns = 2;
+  uint32_t curRun = 0;
+  uint64_t curSector = 0;
 
   unsigned char *inBuffer;
   unsigned char *outBuffer;
@@ -28,7 +29,6 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
   z_stream strm;
 
   blkx = (BLKXTable *)malloc(sizeof(BLKXTable) + (2 * sizeof(BLKXRun)));
-  roomForRuns = 2;
   memset(blkx, 0, sizeof(BLKXTable) + (roomForRuns * sizeof(BLKXRun)));
 
   blkx->fUDIFBlocksSignature = UDIF_BLOCK_SIGNATURE;
@@ -36,7 +36,7 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
   blkx->firstSectorNumber = firstSectorNumber;
   blkx->sectorCount = numSectors;
   blkx->dataStart = 0;
-  blkx->decompressBufferRequested = 0x208;
+  blkx->decompressBufferRequested = BUFFERS_NEEDED;
   blkx->blocksDescriptor = blocksDescriptor;
   blkx->reserved1 = 0;
   blkx->reserved2 = 0;
@@ -53,9 +53,6 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
 
   ASSERT(inBuffer = (unsigned char *)malloc(bufferSize), "malloc");
   ASSERT(outBuffer = (unsigned char *)malloc(bufferSize), "malloc");
-
-  curRun = 0;
-  curSector = 0;
 
   while (numSectors > 0) {
     if (curRun >= roomForRuns) {
