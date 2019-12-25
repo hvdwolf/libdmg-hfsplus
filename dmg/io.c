@@ -13,7 +13,7 @@
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
                       uint32_t firstSectorNumber, uint32_t fileLength,
-                      uint32_t checksumType, ChecksumFunc uncompressedChk,
+                      ChecksumFunc uncompressedChk,
                       void *uncompressedChkToken, ChecksumFunc compressedChk,
                       void *compressedChkToken) {
   BLKXTable *blkx;
@@ -49,7 +49,7 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
   blkx->reserved5 = 0;
   blkx->reserved6 = 0;
   memset(&(blkx->checksum), 0, sizeof(blkx->checksum));
-  blkx->checksum.type = checksumType;
+  blkx->checksum.type = CHECKSUM_CRC32;
   blkx->checksum.size = 0x20;
   blkx->blocksRunCount = 0;
 
