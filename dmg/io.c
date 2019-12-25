@@ -3,7 +3,7 @@
 #include <string.h>
 #include <zlib.h>
 
-#include <dmg/dmg.h>
+#include <dmg.h>
 #include <inttypes.h>
 
 #define BUFFERS_NEEDED 0x208    // 520

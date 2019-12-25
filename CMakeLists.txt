@@ -20,5 +20,4 @@ ENDIF(BUILD_STATIC)
 
 include_directories(${PROJECT_SOURCE_DIR}/includes)
 
-add_subdirectory(common)
 add_subdirectory(dmg)

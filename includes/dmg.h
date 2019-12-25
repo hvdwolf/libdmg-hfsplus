@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "abstractfile.h"
+#include <abstractfile.h>
 
 #define CHECKSUM_CRC32 0x00000002
 #define CHECKSUM_MKBLOCK 0x0002

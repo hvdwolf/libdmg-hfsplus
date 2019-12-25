@@ -1,7 +1,7 @@
 #ifndef ABSTRACTFILE_H
 #define ABSTRACTFILE_H
 
-#include "common.h"
+#include <common.h>
 #include <stdint.h>
 
 typedef struct AbstractFile AbstractFile;

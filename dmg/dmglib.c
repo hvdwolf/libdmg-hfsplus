@@ -1,6 +1,6 @@
-#include "abstractfile.h"
-#include "common.h"
-#include <dmg/dmg.h>
+#include <abstractfile.h>
+#include <common.h>
+#include <dmg.h>
 #include <string.h>
 
 uint32_t calculateMasterChecksum(ResourceKey *resources) {

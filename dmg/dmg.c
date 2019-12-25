@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <dmg/dmg.h>
+#include <dmg.h>
 
 int buildInOut(const char *source, const char *dest, AbstractFile **in,
                AbstractFile **out) {

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <dmg/dmg.h>
+#include <dmg.h>
 
 void BlockCRC(void *token, const unsigned char *data, size_t len) {
   ChecksumToken *ckSumToken;
