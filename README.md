@@ -2,6 +2,10 @@
 
 This is a stripped down version of [libdmg-hfsplus](https://github.com/planetbeing/libdmg-hfsplus), which only contains the `dmg` tool.
 
+Ideally, the minimal c code could be ported to Rust. We could also
+reimplement the build ISO functionality and skip the `genisoimage`
+step during gitian building.
+
 ## Build
 
 `zlib` is required.
@@ -12,6 +16,10 @@ cmake . -B build
 make -C build/dmg -j8
 build/dmg/dmg
 ```
+
+## DMG Notes
+
+http://newosxbook.com/DMG.html
 
 ## License
 

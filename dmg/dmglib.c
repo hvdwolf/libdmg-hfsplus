@@ -1,170 +1,184 @@
-#include <string.h>
-#include "common.h"
 #include "abstractfile.h"
+#include "common.h"
 #include <dmg/dmg.h>
+#include <string.h>
 
-uint32_t calculateMasterChecksum(ResourceKey* resources) {
-	ResourceKey* blkxKeys;
-	ResourceData* data;
-	BLKXTable* blkx;
-	unsigned char* buffer;
-	int blkxNum = 0;
-	uint32_t result = 0;
-	
-	blkxKeys = getResourceByKey(resources, "blkx");
-	
-	data = blkxKeys->data;
-	while(data != NULL) {
-		blkx = (BLKXTable*) data->data;
-		if(blkx->checksum.type == CHECKSUM_CRC32) {
-			blkxNum++;
-		}
-		data = data->next;
-	}
-	
-	buffer = (unsigned char*) malloc(4 * blkxNum);
-	data = blkxKeys->data;
-	blkxNum = 0;
-	while(data != NULL) {
-		blkx = (BLKXTable*) data->data;
-		if(blkx->checksum.type == CHECKSUM_CRC32) {
-			buffer[(blkxNum * 4) + 0] = (blkx->checksum.data[0] >> 24) & 0xff;
-			buffer[(blkxNum * 4) + 1] = (blkx->checksum.data[0] >> 16) & 0xff;
-			buffer[(blkxNum * 4) + 2] = (blkx->checksum.data[0] >> 8) & 0xff;
-			buffer[(blkxNum * 4) + 3] = (blkx->checksum.data[0] >> 0) & 0xff;
-			blkxNum++;
-		}
-		data = data->next;
-	}
-	
-	CRC32Checksum(&result, (const unsigned char*) buffer, 4 * blkxNum);
-	free(buffer);
-	return result;  
+uint32_t calculateMasterChecksum(ResourceKey *resources) {
+  ResourceKey *blkxKeys;
+  ResourceData *data;
+  BLKXTable *blkx;
+  unsigned char *buffer;
+  int blkxNum = 0;
+  uint32_t result = 0;
+
+  blkxKeys = getResourceByKey(resources, "blkx");
+
+  data = blkxKeys->data;
+  while (data != NULL) {
+    blkx = (BLKXTable *)data->data;
+    if (blkx->checksum.type == CHECKSUM_CRC32) {
+      blkxNum++;
+    }
+    data = data->next;
+  }
+
+  buffer = (unsigned char *)malloc(4 * blkxNum);
+  data = blkxKeys->data;
+  blkxNum = 0;
+  while (data != NULL) {
+    blkx = (BLKXTable *)data->data;
+    if (blkx->checksum.type == CHECKSUM_CRC32) {
+      buffer[(blkxNum * 4) + 0] = (blkx->checksum.data[0] >> 24) & 0xff;
+      buffer[(blkxNum * 4) + 1] = (blkx->checksum.data[0] >> 16) & 0xff;
+      buffer[(blkxNum * 4) + 2] = (blkx->checksum.data[0] >> 8) & 0xff;
+      buffer[(blkxNum * 4) + 3] = (blkx->checksum.data[0] >> 0) & 0xff;
+      blkxNum++;
+    }
+    data = data->next;
+  }
+
+  CRC32Checksum(&result, (const unsigned char *)buffer, 4 * blkxNum);
+  free(buffer);
+  return result;
 }
 
-void convertToDMG(AbstractFile* abstractIn, AbstractFile* abstractOut) {
-	
-	BLKXTable* blkx;
-	ResourceKey* resources = NULL;
-	ResourceKey* curResource = NULL;
-	
-	ChecksumToken dataForkToken;
-	ChecksumToken uncompressedToken;
-	
-	NSizResource* nsiz = NULL;
-	NSizResource* myNSiz = NULL;
-	CSumResource csum;
-	
-	off_t plistOffset;
-	uint32_t plistSize;
-	uint32_t dataForkChecksum;
-	uint64_t numSectors = 0;
-	
-	UDIFResourceFile koly;
+void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
 
-	off_t fileLength;
+  BLKXTable *blkx;
+  ResourceKey *resources = NULL;
+  ResourceKey *curResource = NULL;
 
-	memset(&dataForkToken, 0, sizeof(ChecksumToken));
-	memset(koly.fUDIFMasterChecksum.data, 0, sizeof(koly.fUDIFMasterChecksum.data));
-	memset(koly.fUDIFDataForkChecksum.data, 0, sizeof(koly.fUDIFDataForkChecksum.data));
+  ChecksumToken dataForkToken;
+  ChecksumToken uncompressedToken;
 
-	fileLength = abstractIn->getLength(abstractIn);
-	
-	memset(&uncompressedToken, 0, sizeof(uncompressedToken));
-	
-	abstractIn->seek(abstractIn, 0);
-	blkx = insertBLKX(abstractOut, abstractIn, 0, fileLength/SECTOR_SIZE, ENTIRE_DEVICE_DESCRIPTOR, CHECKSUM_CRC32,
-				&BlockCRC, &uncompressedToken, &CRCProxy, &dataForkToken);
-	blkx->checksum.data[0] = uncompressedToken.crc;
-	resources = insertData(resources, "blkx", 0, "whole disk (unknown partition : 0)", (const char*) blkx, sizeof(BLKXTable) + (blkx->blocksRunCount * sizeof(BLKXRun)), ATTRIBUTE_HDIUTIL);
-	free(blkx);
-	
-	memset(&csum, 0, sizeof(CSumResource));
-	csum.version = 1;
-	csum.type = CHECKSUM_MKBLOCK;
-	csum.checksum = uncompressedToken.block;
-	resources = insertData(resources, "cSum", 0, "", (const char*) (&csum), sizeof(csum), 0);
-	
-	if(nsiz == NULL) {
-		nsiz = myNSiz = (NSizResource*) malloc(sizeof(NSizResource));
-	} else {
-		myNSiz->next = (NSizResource*) malloc(sizeof(NSizResource));
-		myNSiz = myNSiz->next;
-	}
-	
-	memset(myNSiz, 0, sizeof(NSizResource));
-	myNSiz->isVolume = 0;
-	myNSiz->blockChecksum2 = uncompressedToken.block;
-	myNSiz->partitionNumber = 0;
-	myNSiz->version = 6;
-	myNSiz->next = NULL;
-	
-	koly.fUDIFImageVariant = kUDIFPartitionImageType;
-	
-	dataForkChecksum = dataForkToken.crc;
-	
-	printf("Writing XML data...\n"); fflush(stdout);
-	curResource = resources;
-	while(curResource->next != NULL)
-		curResource = curResource->next;
-    
-	curResource->next = writeNSiz(nsiz);
-	curResource = curResource->next;
-	releaseNSiz(nsiz);
-	
-	curResource->next = makePlst();
-	curResource = curResource->next;
-	
-	plistOffset = abstractOut->tell(abstractOut);
-	writeResources(abstractOut, resources);
-	plistSize = abstractOut->tell(abstractOut) - plistOffset;
-	
-	printf("Generating UDIF metadata...\n"); fflush(stdout);
-	
-	koly.fUDIFSignature = KOLY_SIGNATURE;
-	koly.fUDIFVersion = 4;
-	koly.fUDIFHeaderSize = sizeof(koly);
-	koly.fUDIFFlags = kUDIFFlagsFlattened;
-	koly.fUDIFRunningDataForkOffset = 0;
-	koly.fUDIFDataForkOffset = 0;
-	koly.fUDIFDataForkLength = plistOffset;
-	koly.fUDIFRsrcForkOffset = 0;
-	koly.fUDIFRsrcForkLength = 0;
-	
-	koly.fUDIFSegmentNumber = 1;
-	koly.fUDIFSegmentCount = 1;
-	koly.fUDIFSegmentID.data1 = rand();
-	koly.fUDIFSegmentID.data2 = rand();
-	koly.fUDIFSegmentID.data3 = rand();
-	koly.fUDIFSegmentID.data4 = rand();
-	koly.fUDIFDataForkChecksum.type = CHECKSUM_CRC32;
-	koly.fUDIFDataForkChecksum.size = 0x20;
-	koly.fUDIFDataForkChecksum.data[0] = dataForkChecksum;
-	koly.fUDIFXMLOffset = plistOffset;
-	koly.fUDIFXMLLength = plistSize;
-	memset(&(koly.reserved1), 0, 0x78);
-	
-	koly.fUDIFMasterChecksum.type = CHECKSUM_CRC32;
-	koly.fUDIFMasterChecksum.size = 0x20;
-	koly.fUDIFMasterChecksum.data[0] = calculateMasterChecksum(resources);
-	printf("Master checksum: %x\n", koly.fUDIFMasterChecksum.data[0]); fflush(stdout); 
-	
-	koly.fUDIFSectorCount = numSectors;
-	koly.reserved2 = 0;
-	koly.reserved3 = 0;
-	koly.reserved4 = 0;
-	
-	printf("Writing out UDIF resource file...\n"); fflush(stdout); 
-	
-	writeUDIFResourceFile(abstractOut, &koly);
-	
-	printf("Cleaning up...\n"); fflush(stdout);
-	
-	releaseResources(resources);
-	
-	abstractIn->close(abstractIn);
-	
-	printf("Done\n"); fflush(stdout);
+  NSizResource *nsiz = NULL;
+  NSizResource *myNSiz = NULL;
+  CSumResource csum;
 
-	abstractOut->close(abstractOut);
+  off_t plistOffset;
+  uint32_t plistSize;
+  uint32_t dataForkChecksum;
+  uint64_t numSectors = 0;
+
+  UDIFResourceFile koly;
+
+  off_t fileLength;
+
+  memset(&dataForkToken, 0, sizeof(ChecksumToken));
+  memset(koly.fUDIFMasterChecksum.data, 0,
+         sizeof(koly.fUDIFMasterChecksum.data));
+  memset(koly.fUDIFDataForkChecksum.data, 0,
+         sizeof(koly.fUDIFDataForkChecksum.data));
+
+  fileLength = abstractIn->getLength(abstractIn);
+
+  memset(&uncompressedToken, 0, sizeof(uncompressedToken));
+
+  abstractIn->seek(abstractIn, 0);
+  blkx = insertBLKX(abstractOut, abstractIn, 0, fileLength / SECTOR_SIZE,
+                    ENTIRE_DEVICE_DESCRIPTOR, CHECKSUM_CRC32, &BlockCRC,
+                    &uncompressedToken, &CRCProxy, &dataForkToken);
+  blkx->checksum.data[0] = uncompressedToken.crc;
+  resources =
+      insertData(resources, "blkx", 0, "whole disk (unknown partition : 0)",
+                 (const char *)blkx,
+                 sizeof(BLKXTable) + (blkx->blocksRunCount * sizeof(BLKXRun)),
+                 ATTRIBUTE_HDIUTIL);
+  free(blkx);
+
+  memset(&csum, 0, sizeof(CSumResource));
+  csum.version = 1;
+  csum.type = CHECKSUM_MKBLOCK;
+  csum.checksum = uncompressedToken.block;
+  resources = insertData(resources, "cSum", 0, "", (const char *)(&csum),
+                         sizeof(csum), 0);
+
+  if (nsiz == NULL) {
+    nsiz = myNSiz = (NSizResource *)malloc(sizeof(NSizResource));
+  } else {
+    myNSiz->next = (NSizResource *)malloc(sizeof(NSizResource));
+    myNSiz = myNSiz->next;
+  }
+
+  memset(myNSiz, 0, sizeof(NSizResource));
+  myNSiz->isVolume = 0;
+  myNSiz->blockChecksum2 = uncompressedToken.block;
+  myNSiz->partitionNumber = 0;
+  myNSiz->version = 6;
+  myNSiz->next = NULL;
+
+  koly.fUDIFImageVariant = kUDIFPartitionImageType;
+
+  dataForkChecksum = dataForkToken.crc;
+
+  printf("Writing XML data...\n");
+  fflush(stdout);
+  curResource = resources;
+  while (curResource->next != NULL)
+    curResource = curResource->next;
+
+  curResource->next = writeNSiz(nsiz);
+  curResource = curResource->next;
+  releaseNSiz(nsiz);
+
+  curResource->next = makePlst();
+  curResource = curResource->next;
+
+  plistOffset = abstractOut->tell(abstractOut);
+  writeResources(abstractOut, resources);
+  plistSize = abstractOut->tell(abstractOut) - plistOffset;
+
+  printf("Generating UDIF metadata...\n");
+  fflush(stdout);
+
+  koly.fUDIFSignature = KOLY_SIGNATURE;
+  koly.fUDIFVersion = 4;
+  koly.fUDIFHeaderSize = sizeof(koly);
+  koly.fUDIFFlags = kUDIFFlagsFlattened;
+  koly.fUDIFRunningDataForkOffset = 0;
+  koly.fUDIFDataForkOffset = 0;
+  koly.fUDIFDataForkLength = plistOffset;
+  koly.fUDIFRsrcForkOffset = 0;
+  koly.fUDIFRsrcForkLength = 0;
+
+  koly.fUDIFSegmentNumber = 1;
+  koly.fUDIFSegmentCount = 1;
+  koly.fUDIFSegmentID.data1 = rand();
+  koly.fUDIFSegmentID.data2 = rand();
+  koly.fUDIFSegmentID.data3 = rand();
+  koly.fUDIFSegmentID.data4 = rand();
+  koly.fUDIFDataForkChecksum.type = CHECKSUM_CRC32;
+  koly.fUDIFDataForkChecksum.size = 0x20;
+  koly.fUDIFDataForkChecksum.data[0] = dataForkChecksum;
+  koly.fUDIFXMLOffset = plistOffset;
+  koly.fUDIFXMLLength = plistSize;
+  memset(&(koly.reserved1), 0, 0x78);
+
+  koly.fUDIFMasterChecksum.type = CHECKSUM_CRC32;
+  koly.fUDIFMasterChecksum.size = 0x20;
+  koly.fUDIFMasterChecksum.data[0] = calculateMasterChecksum(resources);
+  printf("Master checksum: %x\n", koly.fUDIFMasterChecksum.data[0]);
+  fflush(stdout);
+
+  koly.fUDIFSectorCount = numSectors;
+  koly.reserved2 = 0;
+  koly.reserved3 = 0;
+  koly.reserved4 = 0;
+
+  printf("Writing out UDIF resource file...\n");
+  fflush(stdout);
+
+  writeUDIFResourceFile(abstractOut, &koly);
+
+  printf("Cleaning up...\n");
+  fflush(stdout);
+
+  releaseResources(resources);
+
+  abstractIn->close(abstractIn);
+
+  printf("Done\n");
+  fflush(stdout);
+
+  abstractOut->close(abstractOut);
 }
