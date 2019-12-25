@@ -3,45 +3,6 @@
 #include <dmg.h>
 #include <string.h>
 
-uint32_t calculateMasterChecksum(ResourceKey *resources) {
-  ResourceKey *blkxKeys;
-  ResourceData *data;
-  BLKXTable *blkx;
-  unsigned char *buffer;
-  int blkxNum = 0;
-  uint32_t result = 0;
-
-  blkxKeys = getResourceByKey(resources, "blkx");
-
-  data = blkxKeys->data;
-  while (data != NULL) {
-    blkx = (BLKXTable *)data->data;
-    if (blkx->checksum.type == CHECKSUM_CRC32) {
-      blkxNum++;
-    }
-    data = data->next;
-  }
-
-  buffer = (unsigned char *)malloc(4 * blkxNum);
-  data = blkxKeys->data;
-  blkxNum = 0;
-  while (data != NULL) {
-    blkx = (BLKXTable *)data->data;
-    if (blkx->checksum.type == CHECKSUM_CRC32) {
-      buffer[(blkxNum * 4) + 0] = (blkx->checksum.data[0] >> 24) & 0xff;
-      buffer[(blkxNum * 4) + 1] = (blkx->checksum.data[0] >> 16) & 0xff;
-      buffer[(blkxNum * 4) + 2] = (blkx->checksum.data[0] >> 8) & 0xff;
-      buffer[(blkxNum * 4) + 3] = (blkx->checksum.data[0] >> 0) & 0xff;
-      blkxNum++;
-    }
-    data = data->next;
-  }
-
-  CRC32Checksum(&result, (const unsigned char *)buffer, 4 * blkxNum);
-  free(buffer);
-  return result;
-}
-
 void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
 
   BLKXTable *blkx;

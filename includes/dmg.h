@@ -221,6 +221,7 @@ uint32_t MKBlockChecksum(uint32_t *ckSum, const unsigned char *data,
                          size_t len);
 
 void BlockCRC(void *token, const unsigned char *data, size_t len);
+uint32_t calculateMasterChecksum(ResourceKey *resources);
 void CRCProxy(void *token, const unsigned char *data, size_t len);
 
 void flipUDIFChecksum(UDIFChecksum *o, char out);
