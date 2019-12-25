@@ -8,9 +8,10 @@
 
 #define BUFFERS_NEEDED 0x208 // 520
 #define SECTORS_AT_A_TIME 0x200 // 512
+#define SECTOR_SIZE 512
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
-                      uint32_t firstSectorNumber, uint32_t numSectors,
+                      uint32_t firstSectorNumber, uint32_t fileLength,
                       uint32_t blocksDescriptor, uint32_t checksumType,
                       ChecksumFunc uncompressedChk, void *uncompressedChkToken,
                       ChecksumFunc compressedChk, void *compressedChkToken) {
@@ -25,6 +26,8 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
   size_t bufferSize;
   size_t have;
   int ret;
+
+  uint32_t numSectors = fileLength / SECTOR_SIZE;
 
   z_stream strm;
 

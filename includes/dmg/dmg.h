@@ -15,8 +15,6 @@
 #define BLOCK_RAW 0x00000001
 #define BLOCK_TERMINATOR 0xFFFFFFFF
 
-#define SECTOR_SIZE 512
-
 #define UDIF_BLOCK_SIGNATURE 0x6D697368 // mish
 #define KOLY_SIGNATURE 0x6B6F6C79 // koly
 
@@ -252,7 +250,7 @@ ResourceKey *insertData(ResourceKey *resources, const char *key, int id,
 ResourceKey *makePlst();
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
-                      uint32_t firstSectorNumber, uint32_t numSectors,
+                      uint32_t firstSectorNumber, uint32_t fileLength,
                       uint32_t blocksDescriptor, uint32_t checksumType,
                       ChecksumFunc uncompressedChk, void *uncompressedChkToken,
                       ChecksumFunc compressedChk, void *compressedChkToken);
