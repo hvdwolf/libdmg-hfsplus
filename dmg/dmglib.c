@@ -143,6 +143,12 @@ void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
 
   koly.fUDIFSegmentNumber = 1;
   koly.fUDIFSegmentCount = 1;
+  // The output of rand() here is deterministic.
+  // No calls to srand() are made, so rand() is
+  // automatically seeded with a value of 1.
+  // See: https://linux.die.net/man/3/rand
+  // TODO: Just hardcode a "random" value. As this
+  // needs to remain deterministic.
   koly.fUDIFSegmentID.data1 = rand();
   koly.fUDIFSegmentID.data2 = rand();
   koly.fUDIFSegmentID.data3 = rand();
