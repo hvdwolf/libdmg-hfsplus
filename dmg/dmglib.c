@@ -113,8 +113,9 @@ void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
   printf("Writing XML data...\n");
   fflush(stdout);
   curResource = resources;
-  while (curResource->next != NULL)
+  while (curResource->next != NULL) {
     curResource = curResource->next;
+  }
 
   curResource->next = writeNSiz(nsiz);
   curResource = curResource->next;
@@ -147,14 +148,14 @@ void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
   koly.fUDIFSegmentID.data3 = rand();
   koly.fUDIFSegmentID.data4 = rand();
   koly.fUDIFDataForkChecksum.type = CHECKSUM_CRC32;
-  koly.fUDIFDataForkChecksum.size = 0x20;
+  koly.fUDIFDataForkChecksum.size = KOLY_CHECKSUM_SIZE;
   koly.fUDIFDataForkChecksum.data[0] = dataForkChecksum;
   koly.fUDIFXMLOffset = plistOffset;
   koly.fUDIFXMLLength = plistSize;
-  memset(&(koly.reserved1), 0, 0x78);
+  memset(&(koly.reserved1), 0, KOLY_RESERVED);
 
   koly.fUDIFMasterChecksum.type = CHECKSUM_CRC32;
-  koly.fUDIFMasterChecksum.size = 0x20;
+  koly.fUDIFMasterChecksum.size = KOLY_CHECKSUM_SIZE;
   koly.fUDIFMasterChecksum.data[0] = calculateMasterChecksum(resources);
   printf("Master checksum: %x\n", koly.fUDIFMasterChecksum.data[0]);
   fflush(stdout);

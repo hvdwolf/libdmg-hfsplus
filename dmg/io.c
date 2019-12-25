@@ -6,16 +6,15 @@
 #include <dmg.h>
 #include <inttypes.h>
 
-#define BUFFERS_NEEDED 0x208    // 520
+#define BUFFERS_NEEDED 0x208 // 520
 #define ENTIRE_DEVICE_DESCRIPTOR 0xFFFFFFFE
 #define SECTORS_AT_A_TIME 0x200 // 512
 #define SECTOR_SIZE 512
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
                       uint32_t firstSectorNumber, uint32_t fileLength,
-                      ChecksumFunc uncompressedChk,
-                      void *uncompressedChkToken, ChecksumFunc compressedChk,
-                      void *compressedChkToken) {
+                      ChecksumFunc uncompressedChk, void *uncompressedChkToken,
+                      ChecksumFunc compressedChk, void *compressedChkToken) {
   BLKXTable *blkx;
 
   uint32_t roomForRuns = 2;

@@ -17,6 +17,8 @@
 
 #define UDIF_BLOCK_SIGNATURE 0x6D697368 // mish
 #define KOLY_SIGNATURE 0x6B6F6C79       // koly
+#define KOLY_CHECKSUM_SIZE 0x20         // 32
+#define KOLY_RESERVED 0x78              // 120
 
 #define ATTRIBUTE_HDIUTIL 0x0050
 
@@ -60,9 +62,9 @@ typedef struct {
   uint64_t fUDIFXMLOffset;
   uint64_t fUDIFXMLLength;
 
-  uint8_t
-      reserved1[0x78]; /* this is actually the perfect amount of space to store
-                          every thing in this struct until the checksum */
+  uint8_t reserved1[KOLY_RESERVED]; /* this is actually the perfect amount of
+                              space to store every thing in this struct until
+                              the checksum */
 
   UDIFChecksum fUDIFMasterChecksum;
 
