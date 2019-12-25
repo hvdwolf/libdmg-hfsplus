@@ -5,7 +5,9 @@ project (libdmg-hfsplus)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-set(CMAKE_C_FLAGS "-Wall")
+set(CMAKE_C_FLAGS "-Wall -O2")
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # We want win32 executables to build staticly by default, since it's more difficult to keep the shared libraries straight on Windows
 IF(WIN32)

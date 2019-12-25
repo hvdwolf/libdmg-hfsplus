@@ -10,11 +10,26 @@ step during gitian building.
 
 `zlib` is required.
 
-Configure, compile and run using:
+Configure, compile and run:
 ```bash
 cmake . -B build
 make -C build/dmg -j8
 build/dmg/dmg
+```
+
+Compare DMG output for a Bitcoin-Core ISO (from `genisoimage`):
+```bash
+git clean -fxd && \
+cmake . -B build && \
+make -C build/dmg -j8 && \
+build/dmg/dmg Bitcoin-Core.iso osx-unsigned.dmg && \
+diffoscope osx-unsigned-orig.dmg osx-unsigned.dmg
+```
+
+Running Clang tools:
+```bash
+clang-format -i dmg/*.c
+clang-tidy -p build --checks=modernize dmg/*.c
 ```
 
 ## DMG Notes
