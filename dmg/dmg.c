@@ -5,37 +5,27 @@
 
 #include <dmg.h>
 
-int buildInOut(const char *source, const char *dest, AbstractFile **in,
-               AbstractFile **out) {
-  *in = createAbstractFileFromFile(fopen(source, "rb"));
-  if (!(*in)) {
-    printf("cannot open source ISO: %s\n", source);
-    return 0;
-  }
-
-  *out = createAbstractFileFromFile(fopen(dest, "wb"));
-  if (!(*out)) {
-    (*in)->close(*in);
-    printf("cannot open destination DMG: %s\n", dest);
-    return 0;
-  }
-
-  return 1;
-}
-
 int main(int argc, char *argv[]) {
-  AbstractFile *in;
-  AbstractFile *out;
+  AbstractFile *iso = NULL;
+  AbstractFile *dmg = NULL;
 
   if (argc < 3) {
-    printf("usage: ./dmg .iso .dmg\n");
-    return 0;
+    fprintf(stderr, "usage: ./dmg path/to/.iso path/to/.dmg\n");
+    exit(EXIT_FAILURE);
   }
 
-  if (!buildInOut(argv[1], argv[2], &in, &out)) {
-    return 0;
+  iso = createAbstractFileFromFile(fopen(argv[1], "rb"));
+  if (!iso) {
+    fprintf(stderr, "Cannot open source ISO: %s\n", argv[1]);
+    exit(EXIT_FAILURE);
   }
 
-  convertToDMG(in, out);
-  return 0;
+  dmg = createAbstractFileFromFile(fopen(argv[2], "wb"));
+  if (!dmg) {
+    (iso)->close(iso);
+    fprintf(stderr, "cannot open destination DMG: %s\n", argv[2]);
+    exit(EXIT_FAILURE);
+  }
+
+  return convertToDMG(iso, dmg);
 }

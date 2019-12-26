@@ -3,7 +3,7 @@
 #include <dmg.h>
 #include <string.h>
 
-void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
+int convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
 
   BLKXTable *blkx;
   ResourceKey *resources = NULL;
@@ -148,4 +148,5 @@ void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
   fflush(stdout);
 
   abstractOut->close(abstractOut);
+  return EXIT_SUCCESS;
 }
