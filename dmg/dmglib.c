@@ -43,6 +43,8 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
                  sizeof(BLKXTable) + (blkx->blocksRunCount * sizeof(BLKXRun)),
                  ATTRIBUTE_HDIUTIL);
   free(blkx);
+  printf("Wrote out BLKX data.\n");
+  fflush(stdout);
 
   memset(&csum, 0, sizeof(CSumResource));
   csum.version = 1;
@@ -60,12 +62,8 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
   myNSiz->version = 6;
   myNSiz->next = NULL;
 
-  koly.fUDIFImageVariant = kUDIFPartitionImageType;
-
   dataForkChecksum = dataForkToken.crc;
 
-  printf("Writing XML data...\n");
-  fflush(stdout);
   curResource = resources;
   while (curResource->next != NULL) {
     curResource = curResource->next;
@@ -82,7 +80,7 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
   writeResources(dmg, resources);
   plistSize = dmg->tell(dmg) - plistOffset;
 
-  printf("Generating UDIF metadata...\n");
+  printf("Wrote out XML plist data...\n");
   fflush(stdout);
 
   koly.fUDIFSignature = KOLY_SIGNATURE;
@@ -117,29 +115,24 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
   koly.fUDIFMasterChecksum.type = CHECKSUM_CRC32;
   koly.fUDIFMasterChecksum.size = KOLY_CHECKSUM_SIZE;
   koly.fUDIFMasterChecksum.data[0] = calculateMasterChecksum(resources);
-  printf("Master checksum: %x\n", koly.fUDIFMasterChecksum.data[0]);
-  fflush(stdout);
 
+  koly.fUDIFImageVariant = kUDIFPartitionImageType;
   koly.fUDIFSectorCount = 0;
   koly.reserved2 = 0;
   koly.reserved3 = 0;
   koly.reserved4 = 0;
 
-  printf("Writing out UDIF resource file...\n");
-  fflush(stdout);
-
   writeUDIFResourceFile(dmg, &koly);
 
-  printf("Cleaning up...\n");
+  printf("Wrote out koly header.\n");
   fflush(stdout);
 
   releaseResources(resources);
-
   iso->close(iso);
+  dmg->close(dmg);
 
   printf("Done\n");
   fflush(stdout);
 
-  dmg->close(dmg);
   return EXIT_SUCCESS;
 }
