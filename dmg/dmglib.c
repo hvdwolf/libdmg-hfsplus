@@ -19,7 +19,6 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
   off_t plistOffset;
   uint32_t plistSize;
   uint32_t dataForkChecksum;
-  uint64_t numSectors = 0;
 
   UDIFResourceFile koly;
 
@@ -122,7 +121,7 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
   printf("Master checksum: %x\n", koly.fUDIFMasterChecksum.data[0]);
   fflush(stdout);
 
-  koly.fUDIFSectorCount = numSectors;
+  koly.fUDIFSectorCount = 0;
   koly.reserved2 = 0;
   koly.reserved3 = 0;
   koly.reserved4 = 0;
