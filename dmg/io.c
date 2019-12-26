@@ -12,9 +12,9 @@
 #define SECTOR_SIZE 512
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
-                      uint32_t firstSectorNumber, uint32_t fileLength,
-                      ChecksumFunc uncompressedChk, void *uncompressedChkToken,
-                      ChecksumFunc compressedChk, void *compressedChkToken) {
+                      uint32_t firstSectorNumber, ChecksumFunc uncompressedChk,
+                      void *uncompressedChkToken, ChecksumFunc compressedChk,
+                      void *compressedChkToken) {
   BLKXTable *blkx;
 
   uint32_t roomForRuns = 2;
@@ -27,7 +27,7 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
   size_t have;
   int ret;
 
-  uint32_t numSectors = fileLength / SECTOR_SIZE;
+  uint32_t numSectors = in->getLength(in) / SECTOR_SIZE;
 
   z_stream strm;
 

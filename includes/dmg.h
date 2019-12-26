@@ -18,7 +18,7 @@
 #define UDIF_BLOCK_SIGNATURE 0x6D697368 // mish
 #define KOLY_SIGNATURE 0x6B6F6C79       // koly
 #define KOLY_CHECKSUM_SIZE 0x20         // 32
-#define KOLY_HEADER_SIZE 0x200          // 512         
+#define KOLY_HEADER_SIZE 0x200          // 512
 #define KOLY_RESERVED 0x78              // 120
 
 #define ATTRIBUTE_HDIUTIL 0x0050
@@ -246,9 +246,9 @@ ResourceKey *insertData(ResourceKey *resources, const char *key, int id,
 ResourceKey *makePlst();
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
-                      uint32_t firstSectorNumber, uint32_t fileLength,
-                      ChecksumFunc uncompressedChk, void *uncompressedChkToken,
-                      ChecksumFunc compressedChk, void *compressedChkToken);
+                      uint32_t firstSectorNumber, ChecksumFunc uncompressedChk,
+                      void *uncompressedChkToken, ChecksumFunc compressedChk,
+                      void *compressedChkToken);
 
 int convertToDMG(AbstractFile *iso, AbstractFile *dmg);
 

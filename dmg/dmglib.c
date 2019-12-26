@@ -22,9 +22,7 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
 
   UDIFResourceFile koly;
 
-  off_t fileLength;
-
-  // While only portions of these structures (first int) 
+  // While only portions of these structures (first int)
   // may be used for checksumming, memseting to 0
   // ensures they don't contain garbage and will be
   // deterministic.
@@ -33,14 +31,11 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
          sizeof(koly.fUDIFMasterChecksum.data));
   memset(koly.fUDIFDataForkChecksum.data, 0,
          sizeof(koly.fUDIFDataForkChecksum.data));
-
-  fileLength = iso->getLength(iso);
-
   memset(&uncompressedToken, 0, sizeof(uncompressedToken));
 
   iso->seek(iso, 0);
-  blkx = insertBLKX(dmg, iso, 0, fileLength, &BlockCRC,
-                    &uncompressedToken, &CRCProxy, &dataForkToken);
+  blkx = insertBLKX(dmg, iso, 0, &BlockCRC, &uncompressedToken, &CRCProxy,
+                    &dataForkToken);
   blkx->checksum.data[0] = uncompressedToken.crc;
   resources =
       insertData(resources, "blkx", 0, "whole disk (unknown partition : 0)",
