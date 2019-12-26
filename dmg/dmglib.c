@@ -3,7 +3,7 @@
 #include <dmg.h>
 #include <string.h>
 
-int convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
+int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
 
   BLKXTable *blkx;
   ResourceKey *resources = NULL;
@@ -31,12 +31,12 @@ int convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
   memset(koly.fUDIFDataForkChecksum.data, 0,
          sizeof(koly.fUDIFDataForkChecksum.data));
 
-  fileLength = abstractIn->getLength(abstractIn);
+  fileLength = iso->getLength(iso);
 
   memset(&uncompressedToken, 0, sizeof(uncompressedToken));
 
-  abstractIn->seek(abstractIn, 0);
-  blkx = insertBLKX(abstractOut, abstractIn, 0, fileLength, &BlockCRC,
+  iso->seek(iso, 0);
+  blkx = insertBLKX(dmg, iso, 0, fileLength, &BlockCRC,
                     &uncompressedToken, &CRCProxy, &dataForkToken);
   blkx->checksum.data[0] = uncompressedToken.crc;
   resources =
@@ -85,9 +85,9 @@ int convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
   curResource->next = makePlst();
   curResource = curResource->next;
 
-  plistOffset = abstractOut->tell(abstractOut);
-  writeResources(abstractOut, resources);
-  plistSize = abstractOut->tell(abstractOut) - plistOffset;
+  plistOffset = dmg->tell(dmg);
+  writeResources(dmg, resources);
+  plistSize = dmg->tell(dmg) - plistOffset;
 
   printf("Generating UDIF metadata...\n");
   fflush(stdout);
@@ -135,18 +135,18 @@ int convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut) {
   printf("Writing out UDIF resource file...\n");
   fflush(stdout);
 
-  writeUDIFResourceFile(abstractOut, &koly);
+  writeUDIFResourceFile(dmg, &koly);
 
   printf("Cleaning up...\n");
   fflush(stdout);
 
   releaseResources(resources);
 
-  abstractIn->close(abstractIn);
+  iso->close(iso);
 
   printf("Done\n");
   fflush(stdout);
 
-  abstractOut->close(abstractOut);
+  dmg->close(dmg);
   return EXIT_SUCCESS;
 }

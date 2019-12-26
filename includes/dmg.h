@@ -249,6 +249,6 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
                       ChecksumFunc uncompressedChk, void *uncompressedChkToken,
                       ChecksumFunc compressedChk, void *compressedChkToken);
 
-int convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut);
+int convertToDMG(AbstractFile *iso, AbstractFile *dmg);
 
 #endif
