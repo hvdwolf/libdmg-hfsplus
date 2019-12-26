@@ -24,6 +24,10 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
 
   off_t fileLength;
 
+  // While only portions of these structures (first int) 
+  // may be used for checksumming, memseting to 0
+  // ensures they don't contain garbage and will be
+  // deterministic.
   memset(&dataForkToken, 0, sizeof(ChecksumToken));
   memset(koly.fUDIFMasterChecksum.data, 0,
          sizeof(koly.fUDIFMasterChecksum.data));
