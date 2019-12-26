@@ -30,7 +30,7 @@ enum { kUDIFDeviceImageType = 1, kUDIFPartitionImageType = 2 };
 typedef struct {
   uint32_t type;
   uint32_t size;
-  uint32_t data[0x20];
+  uint32_t data[KOLY_CHECKSUM_SIZE];
 } __attribute__((__packed__)) UDIFChecksum;
 
 typedef struct {
