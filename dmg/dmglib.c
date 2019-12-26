@@ -53,12 +53,7 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
   resources = insertData(resources, "cSum", 0, "", (const char *)(&csum),
                          sizeof(csum), 0);
 
-  if (nsiz == NULL) {
-    nsiz = myNSiz = (NSizResource *)malloc(sizeof(NSizResource));
-  } else {
-    myNSiz->next = (NSizResource *)malloc(sizeof(NSizResource));
-    myNSiz = myNSiz->next;
-  }
+  nsiz = myNSiz = (NSizResource *)malloc(sizeof(NSizResource));
 
   memset(myNSiz, 0, sizeof(NSizResource));
   myNSiz->isVolume = 0;
