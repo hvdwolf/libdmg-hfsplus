@@ -246,9 +246,8 @@ ResourceKey *insertData(ResourceKey *resources, const char *key, int id,
 ResourceKey *makePlst();
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
-                      uint32_t firstSectorNumber, ChecksumFunc uncompressedChk,
-                      void *uncompressedChkToken, ChecksumFunc compressedChk,
-                      void *compressedChkToken);
+                      ChecksumFunc uncompressedChk, void *uncompressedChkToken,
+                      ChecksumFunc compressedChk, void *compressedChkToken);
 
 int convertToDMG(AbstractFile *iso, AbstractFile *dmg);
 

@@ -34,7 +34,7 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
   memset(&uncompressedToken, 0, sizeof(uncompressedToken));
 
   iso->seek(iso, 0);
-  blkx = insertBLKX(dmg, iso, 0, &BlockCRC, &uncompressedToken, &CRCProxy,
+  blkx = insertBLKX(dmg, iso, &BlockCRC, &uncompressedToken, &CRCProxy,
                     &dataForkToken);
   blkx->checksum.data[0] = uncompressedToken.crc;
   resources =

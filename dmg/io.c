@@ -12,9 +12,8 @@
 #define SECTOR_SIZE 512
 
 BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
-                      uint32_t firstSectorNumber, ChecksumFunc uncompressedChk,
-                      void *uncompressedChkToken, ChecksumFunc compressedChk,
-                      void *compressedChkToken) {
+                      ChecksumFunc uncompressedChk, void *uncompressedChkToken,
+                      ChecksumFunc compressedChk, void *compressedChkToken) {
   BLKXTable *blkx;
 
   uint32_t roomForRuns = 2;
@@ -36,7 +35,7 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
 
   blkx->fUDIFBlocksSignature = UDIF_BLOCK_SIGNATURE;
   blkx->infoVersion = 1;
-  blkx->firstSectorNumber = firstSectorNumber;
+  blkx->firstSectorNumber = 0;
   blkx->sectorCount = numSectors;
   blkx->dataStart = 0;
   blkx->decompressBufferRequested = BUFFERS_NEEDED;
@@ -49,7 +48,7 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
   blkx->reserved6 = 0;
   memset(&(blkx->checksum), 0, sizeof(blkx->checksum));
   blkx->checksum.type = CHECKSUM_CRC32;
-  blkx->checksum.size = 0x20;
+  blkx->checksum.size = KOLY_CHECKSUM_SIZE;
   blkx->blocksRunCount = 0;
 
   bufferSize = SECTOR_SIZE * blkx->decompressBufferRequested;
