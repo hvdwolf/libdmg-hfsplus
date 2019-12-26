@@ -207,9 +207,6 @@ static inline void writeUInt64(AbstractFile *file, uint64_t data) {
   ASSERT(file->write(file, &data, sizeof(data)) == sizeof(data), "fwrite");
 }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 unsigned char *decodeBase64(char *toDecode, size_t *dataLength);
 void writeBase64(AbstractFile *file, unsigned char *data, size_t dataLength,
                  int tabLength, int width);
@@ -240,9 +237,6 @@ NSizResource *readNSiz(ResourceKey *resources);
 ResourceKey *writeNSiz(NSizResource *nSiz);
 void releaseNSiz(NSizResource *nSiz);
 
-extern const char *plistHeader;
-extern const char *plistFooter;
-
 ResourceKey *getResourceByKey(ResourceKey *resources, const char *key);
 ResourceData *getDataByID(ResourceKey *resource, int id);
 ResourceKey *insertData(ResourceKey *resources, const char *key, int id,
@@ -256,8 +250,5 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
                       ChecksumFunc compressedChk, void *compressedChkToken);
 
 void convertToDMG(AbstractFile *abstractIn, AbstractFile *abstractOut);
-#ifdef __cplusplus
-}
-#endif
 
 #endif
