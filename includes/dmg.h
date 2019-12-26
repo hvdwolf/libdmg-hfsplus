@@ -18,6 +18,7 @@
 #define UDIF_BLOCK_SIGNATURE 0x6D697368 // mish
 #define KOLY_SIGNATURE 0x6B6F6C79       // koly
 #define KOLY_CHECKSUM_SIZE 0x20         // 32
+#define KOLY_HEADER_SIZE 0x200          // 512         
 #define KOLY_RESERVED 0x78              // 120
 
 #define ATTRIBUTE_HDIUTIL 0x0050

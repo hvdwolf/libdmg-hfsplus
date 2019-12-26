@@ -89,7 +89,7 @@ int convertToDMG(AbstractFile *iso, AbstractFile *dmg) {
 
   koly.fUDIFSignature = KOLY_SIGNATURE;
   koly.fUDIFVersion = 4;
-  koly.fUDIFHeaderSize = sizeof(koly);
+  koly.fUDIFHeaderSize = KOLY_HEADER_SIZE;
   koly.fUDIFFlags = kUDIFFlagsFlattened;
   koly.fUDIFRunningDataForkOffset = 0;
   koly.fUDIFDataForkOffset = 0;
