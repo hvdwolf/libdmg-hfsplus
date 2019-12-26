@@ -30,7 +30,7 @@ BLKXTable *insertBLKX(AbstractFile *out, AbstractFile *in,
 
   z_stream strm;
 
-  blkx = (BLKXTable *)malloc(sizeof(BLKXTable) + (2 * sizeof(BLKXRun)));
+  blkx = (BLKXTable *)malloc(sizeof(BLKXTable) + (roomForRuns * sizeof(BLKXRun)));
   memset(blkx, 0, sizeof(BLKXTable) + (roomForRuns * sizeof(BLKXRun)));
 
   blkx->fUDIFBlocksSignature = UDIF_BLOCK_SIGNATURE;
