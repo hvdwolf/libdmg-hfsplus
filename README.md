@@ -35,6 +35,7 @@ clang-tidy -p build --checks=modernize dmg/*.c
 ## DMG Notes
 
 http://newosxbook.com/DMG.html
+https://developer.apple.com/library/archive/technotes/tn2166/_index.html
 
 ## License
 
